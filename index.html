@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Consumption Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .gas-price-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .gas-price-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .gas-price-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .gas-price-input span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .gas-price-input input {
+            width: 120px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .vehicles-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .vehicle-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-card.winner {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .vehicle-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 30px 0;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results {
+            display: none;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .cost-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .cost-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 3px solid transparent;
+        }
+
+        .cost-item.winner {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .cost-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .cost-item .cost {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .recommendation {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .savings {
+            margin-top: 15px;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .vehicles-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .cost-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Fuel Economy Calculator</h1>
+            <p>Compare two vehicles and find the most economical choice for your trip</p>
+        </div>
+        
+        <div class="content">
+            <div class="gas-price-section">
+                <h3>⛽ Current Gas Price</h3>
+                <div class="gas-price-input">
+                    <span>$</span>
+                    <input type="number" id="gasPrice" value="3.50" step="0.01" min="0">
+                    <span>per gallon</span>
+                </div>
+            </div>
+
+            <div class="vehicles-container">
+                <div class="vehicle-card" id="vehicle1Card">
+                    <h3>Vehicle 1</h3>
+                    <div class="input-group">
+                        <label for="make1">Vehicle Make & Model</label>
+                        <input type="text" id="make1" placeholder="e.g., Toyota Camry">
+                    </div>
+                    <div class="input-group">
+                        <label for="consumption1">Fuel Consumption (MPG)</label>
+                        <input type="number" id="consumption1" placeholder="e.g., 28" min="1" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="mileage1">Trip Distance (miles)</label>
+                        <input type="number" id="mileage1" placeholder="e.g., 300" min="1">
+                    </div>
+                </div>
+
+                <div class="vehicle-card" id="vehicle2Card">
+                    <h3>Vehicle 2</h3>
+                    <div class="input-group">
+                        <label for="make2">Vehicle Make & Model</label>
+                        <input type="text" id="make2" placeholder="e.g., Honda Civic">
+                    </div>
+                    <div class="input-group">
+                        <label for="consumption2">Fuel Consumption (MPG)</label>
+                        <input type="number" id="consumption2" placeholder="e.g., 32" min="1" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="mileage2">Trip Distance (miles)</label>
+                        <input type="number" id="mileage2" placeholder="e.g., 300" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateFuelCosts()">
+                Calculate & Compare Fuel Costs
+            </button>
+
+            <div class="results" id="results">
+                <h3>📊 Trip Cost Comparison</h3>
+                <div class="cost-display">
+                    <div class="cost-item" id="cost1">
+                        <h4 id="vehicle1Name">Vehicle 1</h4>
+                        <div class="cost" id="cost1Value">$0.00</div>
+                    </div>
+                    <div class="cost-item" id="cost2">
+                        <h4 id="vehicle2Name">Vehicle 2</h4>
+                        <div class="cost" id="cost2Value">$0.00</div>
+                    </div>
+                </div>
+                <div class="recommendation" id="recommendation">
+                    <!-- Recommendation will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateFuelCosts() {
+            // Get input values
+            const gasPrice = parseFloat(document.getElementById('gasPrice').value);
+            
+            const make1 = document.getElementById('make1').value.trim();
+            const consumption1 = parseFloat(document.getElementById('consumption1').value);
+            const mileage1 = parseFloat(document.getElementById('mileage1').value);
+            
+            const make2 = document.getElementById('make2').value.trim();
+            const consumption2 = parseFloat(document.getElementById('consumption2').value);
+            const mileage2 = parseFloat(document.getElementById('mileage2').value);
+
+            // Validate inputs
+            if (!gasPrice || gasPrice <= 0) {
+                alert('Please enter a valid gas price');
+                return;
+            }
+
+            if (!make1 || !consumption1 || !mileage1 || consumption1 <= 0 || mileage1 <= 0) {
+                alert('Please fill in all fields for Vehicle 1 with valid values');
+                return;
+            }
+
+            if (!make2 || !consumption2 || !mileage2 || consumption2 <= 0 || mileage2 <= 0) {
+                alert('Please fill in all fields for Vehicle 2 with valid values');
+                return;
+            }
+
+            // Calculate fuel costs
+            // Cost = (Distance / MPG) * Gas Price
+            const gallonsNeeded1 = mileage1 / consumption1;
+            const tripCost1 = gallonsNeeded1 * gasPrice;
+            
+            const gallonsNeeded2 = mileage2 / consumption2;
+            const tripCost2 = gallonsNeeded2 * gasPrice;
+
+            // Display results
+            document.getElementById('vehicle1Name').textContent = make1;
+            document.getElementById('vehicle2Name').textContent = make2;
+            document.getElementById('cost1Value').textContent = '$' + tripCost1.toFixed(2);
+            document.getElementById('cost2Value').textContent = '$' + tripCost2.toFixed(2);
+
+            // Determine winner and show recommendation
+            const cost1Element = document.getElementById('cost1');
+            const cost2Element = document.getElementById('cost2');
+            const vehicle1Card = document.getElementById('vehicle1Card');
+            const vehicle2Card = document.getElementById('vehicle2Card');
+            const recommendationElement = document.getElementById('recommendation');
+
+            // Reset winner classes
+            cost1Element.classList.remove('winner');
+            cost2Element.classList.remove('winner');
+            vehicle1Card.classList.remove('winner');
+            vehicle2Card.classList.remove('winner');
+
+            let recommendationText = '';
+            let savings = 0;
+
+            if (tripCost1 < tripCost2) {
+                cost1Element.classList.add('winner');
+                vehicle1Card.classList.add('winner');
+                savings = tripCost2 - tripCost1;
+                recommendationText = `🏆 Recommended: ${make1}<div class="savings">You'll save $${savings.toFixed(2)} on this trip!</div>`;
+            } else if (tripCost2 < tripCost1) {
+                cost2Element.classList.add('winner');
+                vehicle2Card.classList.add('winner');
+                savings = tripCost1 - tripCost2;
+                recommendationText = `🏆 Recommended: ${make2}<div class="savings">You'll save $${savings.toFixed(2)} on this trip!</div>`;
+            } else {
+                recommendationText = `🤝 Both vehicles have the same fuel cost for this trip!<div class="savings">Choose based on your other preferences.</div>`;
+            }
+
+            recommendationElement.innerHTML = recommendationText;
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Allow Enter key to trigger calculation
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculateFuelCosts();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95fae37992bea936',t:'MTc1MjU5OTU4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
